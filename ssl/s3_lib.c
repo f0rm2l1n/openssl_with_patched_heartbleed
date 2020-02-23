@@ -3547,8 +3547,13 @@ long ssl3_ctrl(SSL *s, int cmd, long larg, void *parg)
         break;
 
 #ifndef OPENSSL_NO_HEARTBEATS
-    case SSL_CTRL_DTLS_EXT_SEND_HEARTBEAT:
+    case SSL_CTRL_TLS_EXT_SEND_HEARTBEAT:
+	// if (SSL_IS_DTLS(s))
+	//
+	ret = tls1_heartbeat(s);
+	break;
     case SSL_CTRL_GET_DTLS_EXT_HEARTBEAT_PENDING:
+	break;
     case SSL_CTRL_SET_DTLS_EXT_HEARTBEAT_NO_REQUESTS:
         break;
 #endif

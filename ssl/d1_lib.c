@@ -882,6 +882,19 @@ static int dtls1_handshake_write(SSL *s)
 {
     return dtls1_do_write(s, SSL3_RT_HANDSHAKE);
 }
+/*
+int dtls1_process_heartbeat(SSL *s, unsigned char *p, size_t length)
+{
+	fprintf(stderr, "dtls1_process_heartbeat not implemented yet\n");
+	return 0;
+}
+
+int dtls1_heartbeat(SSL *s)
+{
+	fprintf(stderr, "dtls1_heartbeat not implemented yet\n");
+	return 0;
+}
+*/
 
 int dtls1_shutdown(SSL *s)
 {

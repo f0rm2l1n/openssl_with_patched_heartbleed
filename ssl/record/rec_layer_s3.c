@@ -1553,6 +1553,19 @@ int ssl3_read_bytes(SSL *s, int type, int *recvd_type, unsigned char *buf,
                  SSL_R_UNKNOWN_ALERT_TYPE);
         return -1;
     }
+    // added by chandler ma
+    else if (SSL3_RECORD_get_type(rr) == DTLS1_RT_HEARTBEAT) {
+	if (tls1_process_heartbeat(s, SSL3_RECORD_get_data(rr),
+                    SSL3_RECORD_get_length(rr)) < 0) {
+                return -1;
+        }	
+	SSL3_RECORD_set_length(rr, 0);
+	s->rwstate = SSL_READING;
+	BIO_clear_retry_flags(SSL_get_rbio(s));
+	BIO_set_retry_read(SSL_get_rbio(s));
+	return (-1);
+    }
+
 
     if ((s->shutdown & SSL_SENT_SHUTDOWN) != 0) {
         if (SSL3_RECORD_get_type(rr) == SSL3_RT_HANDSHAKE) {
