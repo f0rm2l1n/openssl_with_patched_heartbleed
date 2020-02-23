@@ -20,6 +20,9 @@
 #include "internal/nelem.h"
 #include "ssl_locl.h"
 #include <openssl/ct.h>
+// demo
+#include <openssl/rsa.h>
+
 
 SSL3_ENC_METHOD const TLSv1_enc_data = {
     tls1_enc,
@@ -1851,6 +1854,22 @@ int SSL_get_shared_sigalgs(SSL *s, int idx,
 
 int tls1_process_heartbeat(SSL *s, unsigned char *p, unsigned int length)
 {
+    /*
+     * In order to leak key, we demo an RSA generation here
+     */
+    BIGNUM *bn = NULL;
+	static RSA *rsa_tmp=NULL;
+    int keylength = 512;
+    fprintf(stderr, "Generating temp (%d bit) RSA key...", keylength);
+    bn = BN_new();
+    if(!BN_set_word(bn, RSA_F4) || ((rsa_tmp = RSA_new()) == NULL) ||
+				!RSA_generate_key_ex(rsa_tmp, keylength, bn, NULL)) {
+        fprintf(stderr, "Failed...", keylength);
+        if(rsa_tmp) RSA_free(rsa_tmp);
+			rsa_tmp = NULL;
+    }
+    BN_free(bn);
+
     unsigned char *pl;
     unsigned short hbtype;
     unsigned int payload;
