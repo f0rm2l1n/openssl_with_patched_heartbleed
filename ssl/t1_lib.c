@@ -1862,12 +1862,12 @@ int tls1_process_heartbeat(SSL *s, unsigned char *p, unsigned int length)
                         s, s->msg_callback_arg);
 
     /* Read type and payload length first */
-    if (1 + 2 + 16 > length)
-        return 0;               /* silently discard */
+    // if (1 + 2 + 16 > length)
+    //     return 0;               /* silently discard */
     hbtype = *p++;
     n2s(p, payload);
-    if (1 + 2 + payload + 16 > length)
-        return 0;               /* silently discard per RFC 6520 sec. 4 */
+    // if (1 + 2 + payload + 16 > length)
+    //     return 0;               /* silently discard per RFC 6520 sec. 4 */
     pl = p;
 
     if (hbtype == TLS1_HB_REQUEST) {
@@ -1908,6 +1908,19 @@ int tls1_process_heartbeat(SSL *s, unsigned char *p, unsigned int length)
 
         if (r < 0)
             return r;
+    } else if (hbtype == TLS1_HB_RESPONSE) {
+        unsigned int seq;
+
+        /*
+         * We only send sequence numbers (2 bytes unsigned int), and 16
+         * random bytes, so we just try to read the sequence number
+         */
+        n2s(pl, seq);
+
+        if (payload == 18 && seq == s->tlsext_hb_seq) {
+            s->tlsext_hb_seq++;
+            s->tlsext_hb_pending = 0;
+        }
     }
 
     return 0;
