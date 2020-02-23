@@ -272,6 +272,10 @@ int ERR_load_SSL_strings(void);
 # define SSL_F_TLS1_EXPORT_KEYING_MATERIAL                314
 # define SSL_F_TLS1_GET_CURVELIST                         338
 # define SSL_F_TLS1_PRF                                   284
+
+# define SSL_F_TLS1_PROCESS_HEARTBEAT                     341
+# define SSL_F_TLS1_HEARTBEAT                             315
+
 # define SSL_F_TLS1_SAVE_U16                              628
 # define SSL_F_TLS1_SETUP_KEY_BLOCK                       211
 # define SSL_F_TLS1_SET_GROUPS                            629

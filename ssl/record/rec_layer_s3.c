@@ -1554,7 +1554,7 @@ int ssl3_read_bytes(SSL *s, int type, int *recvd_type, unsigned char *buf,
         return -1;
     }
     // added by chandler ma
-    else if (SSL3_RECORD_get_type(rr) == DTLS1_RT_HEARTBEAT) {
+    else if (SSL3_RECORD_get_type(rr) == TLS1_RT_HEARTBEAT) {
 	    if (tls1_process_heartbeat(s, SSL3_RECORD_get_data(rr),
                     SSL3_RECORD_get_length(rr)) < 0) {
                 return -1;

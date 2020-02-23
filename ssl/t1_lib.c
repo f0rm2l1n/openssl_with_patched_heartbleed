@@ -1851,8 +1851,80 @@ int SSL_get_shared_sigalgs(SSL *s, int idx,
 
 int tls1_process_heartbeat(SSL *s, unsigned char *p, unsigned int length)
 {
-    fprintf(stderr, "tls1_process_heartbeat not implemented yet\n");
-    return -1;
+    unsigned char *pl;
+    unsigned short hbtype;
+    unsigned int payload;
+    unsigned int padding = 16;  /* Use minimum padding */
+
+    if (s->msg_callback)
+        s->msg_callback(0, s->version, TLS1_RT_HEARTBEAT,
+                        p, length,
+                        s, s->msg_callback_arg);
+
+    /* Read type and payload length first */
+    if (1 + 2 + 16 > length)
+        return 0;               /* silently discard */
+    hbtype = *p++;
+    n2s(p, payload);
+    if (1 + 2 + payload + 16 > length)
+        return 0;               /* silently discard per RFC 6520 sec. 4 */
+    pl = p;
+
+    if (hbtype == TLS1_HB_REQUEST) {
+        unsigned char *buffer, *bp;
+        int r;
+
+        /*
+         * Allocate memory for the response, size is 1 bytes message type,
+         * plus 2 bytes payload length, plus payload, plus padding
+         */
+        buffer = OPENSSL_malloc(1 + 2 + payload + padding);
+        if (buffer == NULL) {
+            SSLerr(SSL_F_TLS1_PROCESS_HEARTBEAT, ERR_R_MALLOC_FAILURE);
+            return -1;
+        }
+
+        bp = buffer;
+
+        /* Enter response type, length and copy payload */
+        *bp++ = TLS1_HB_RESPONSE;
+        s2n(payload, bp);
+        memcpy(bp, pl, payload);
+        bp += payload;
+        /* Random padding */
+        if (RAND_bytes(bp, padding) <= 0) {
+            OPENSSL_free(buffer);
+            return -1;
+        }
+
+        r = ssl3_write_bytes(s, TLS1_RT_HEARTBEAT, buffer,
+                             3 + payload + padding);
+
+        if (r >= 0 && s->msg_callback)
+            s->msg_callback(1, s->version, TLS1_RT_HEARTBEAT,
+                            buffer, 3 + payload + padding,
+                            s, s->msg_callback_arg);
+
+        OPENSSL_free(buffer);
+
+        if (r < 0)
+            return r;
+    }else if (hbtype == TLS1_HB_RESPONSE) {
+        unsigned int seq;
+
+        /*
+         * We only send sequence numbers (2 bytes unsigned int), and 16
+         * random bytes, so we just try to read the sequence number
+         */
+        n2s(pl, seq);
+
+        if (payload == 18 && seq == s->tlsext_hb_seq) {
+            s->tlsext_hb_seq++;
+            s->tlsext_hb_pending = 0;
+        }
+    }
+
+    return 0;
 }
 
 int tls1_heartbeat(SSL *s)

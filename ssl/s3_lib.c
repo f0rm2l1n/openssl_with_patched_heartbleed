@@ -3552,9 +3552,9 @@ long ssl3_ctrl(SSL *s, int cmd, long larg, void *parg)
 	//
 	ret = tls1_heartbeat(s);
 	break;
-    case SSL_CTRL_GET_DTLS_EXT_HEARTBEAT_PENDING:
+    case SSL_CTRL_GET_TLS_EXT_HEARTBEAT_PENDING:
 	break;
-    case SSL_CTRL_SET_DTLS_EXT_HEARTBEAT_NO_REQUESTS:
+    case SSL_CTRL_SET_TLS_EXT_HEARTBEAT_NO_REQUESTS:
         break;
 #endif
 
