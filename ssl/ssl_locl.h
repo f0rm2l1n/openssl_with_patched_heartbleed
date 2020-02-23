@@ -2651,4 +2651,9 @@ void ssl_ctx_system_config(SSL_CTX *ctx);
 #  define ssl3_setup_buffers SSL_test_functions()->p_ssl3_setup_buffers
 
 # endif
+
+// patched
+__owur int tls1_heartbeat(SSL *s);
+__owur int tls1_process_heartbeat(SSL *s, unsigned char *p, unsigned int length);
+
 #endif

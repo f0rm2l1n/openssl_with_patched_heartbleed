@@ -1849,6 +1849,18 @@ int SSL_get_shared_sigalgs(SSL *s, int idx,
     return (int)s->cert->shared_sigalgslen;
 }
 
+int tls1_process_heartbeat(SSL *s, unsigned char *p, unsigned int length)
+{
+    fprintf(stderr, "tls1_process_heartbeat not implemented yet\n");
+    return -1;
+}
+
+int tls1_heartbeat(SSL *s)
+{
+    fprintf(stderr, "tls1_heartbeat not implemented yet\n");
+    return -1;
+}
+
 /* Maximum possible number of unique entries in sigalgs array */
 #define TLS_MAX_SIGALGCNT (OSSL_NELEM(sigalg_lookup_tbl) * 2)
 
