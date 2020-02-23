@@ -3550,11 +3550,17 @@ long ssl3_ctrl(SSL *s, int cmd, long larg, void *parg)
     case SSL_CTRL_TLS_EXT_SEND_HEARTBEAT:
 	// if (SSL_IS_DTLS(s))
 	//
-	ret = tls1_heartbeat(s);
-	break;
+        ret = tls1_heartbeat(s);
+        break;
     case SSL_CTRL_GET_TLS_EXT_HEARTBEAT_PENDING:
-	break;
+        ret = s->tlsext_hb_pending;
+        break;
     case SSL_CTRL_SET_TLS_EXT_HEARTBEAT_NO_REQUESTS:
+        if (larg)
+            s->tlsext_heartbeat |= SSL_TLSEXT_HB_DONT_RECV_REQUESTS;
+        else
+            s->tlsext_heartbeat &= ~SSL_TLSEXT_HB_DONT_RECV_REQUESTS;
+        ret = 1;
         break;
 #endif
 
