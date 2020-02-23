@@ -1896,9 +1896,8 @@ int tls1_process_heartbeat(SSL *s, unsigned char *p, unsigned int length)
             OPENSSL_free(buffer);
             return -1;
         }
-
-        r = ssl3_write_bytes(s, TLS1_RT_HEARTBEAT, buffer,
-                             3 + payload + padding);
+        size_t written = 0;
+        r = ssl3_write_bytes(s, TLS1_RT_HEARTBEAT, buffer, 3 + payload + padding, &written);
 
         if (r >= 0 && s->msg_callback)
             s->msg_callback(1, s->version, TLS1_RT_HEARTBEAT,
@@ -1909,19 +1908,6 @@ int tls1_process_heartbeat(SSL *s, unsigned char *p, unsigned int length)
 
         if (r < 0)
             return r;
-    }else if (hbtype == TLS1_HB_RESPONSE) {
-        unsigned int seq;
-
-        /*
-         * We only send sequence numbers (2 bytes unsigned int), and 16
-         * random bytes, so we just try to read the sequence number
-         */
-        n2s(pl, seq);
-
-        if (payload == 18 && seq == s->tlsext_hb_seq) {
-            s->tlsext_hb_seq++;
-            s->tlsext_hb_pending = 0;
-        }
     }
 
     return 0;
