@@ -1022,18 +1022,6 @@ struct ssl_ctx_st {
     STACK_OF(SRTP_PROTECTION_PROFILE) *srtp_profiles;
 # endif
 
-        /*-
-         * Is use of the Heartbeat extension negotiated?
-         *  0: disabled
-         *  1: enabled
-         *  2: enabled, but not allowed to send Requests
-         */
-    unsigned int tlsext_heartbeat;
-    /* Indicates if a HeartbeatRequest is in flight */
-    unsigned int tlsext_hb_pending;
-    /* HeartbeatRequest sequence number */
-    unsigned int tlsext_hb_seq;
-
     /*
      * Callback for disabling session caching and ticket support on a session
      * basis, depending on the chosen cipher.
@@ -1360,6 +1348,18 @@ struct ssl_st {
          */
         uint8_t max_fragment_len_mode;
     } ext;
+
+        /*-
+         * Is use of the Heartbeat extension negotiated?
+         *  0: disabled
+         *  1: enabled
+         *  2: enabled, but not allowed to send Requests
+         */
+    unsigned int tlsext_heartbeat;
+    /* Indicates if a HeartbeatRequest is in flight */
+    unsigned int tlsext_hb_pending;
+    /* HeartbeatRequest sequence number */
+    unsigned int tlsext_hb_seq;
 
     /*
      * Parsed form of the ClientHello, kept around across client_hello_cb
